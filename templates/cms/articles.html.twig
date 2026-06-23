@@ -1,0 +1,101 @@
+{% extends 'cms/base.html.twig' %}
+{% block title %}Articles — CMS{% endblock %}
+{% block extra_head %}
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #f5f5f5; }
+    .mono { font-family: ui-monospace, monospace; font-size: 0.9rem; }
+    td.mono a { color: #06c; text-decoration: underline; }
+    td.mono a:hover { color: #039; }
+    .row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    nav a, .row a, .row button, td form button, fieldset form button {
+      display: inline-block; padding: 0.25rem 0.55rem; border: 1px solid #ccc; border-radius: 0.25rem;
+      background: #f5f5f5; color: inherit; font: inherit; line-height: 1.2; text-decoration: none;
+      cursor: pointer; appearance: none; margin: 0;
+    }
+    nav a:hover, .row a:hover, .row button:hover, td form button:hover, fieldset form button:hover { background: #e8e8e8; }
+    .row button:active, td form button:active, fieldset form button:active { background: #ddd; }
+    .field { display: block; margin-bottom: 0.5rem; }
+    .field:last-of-type { margin-bottom: 0.65rem; }
+    .field label { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #555; }
+    .field input[type="text"], .field input:not([type="hidden"]):not([type="file"]):not([type="submit"]),
+    fieldset input[type="text"], fieldset input:not([type="hidden"]):not([type="file"]):not([type="submit"]) {
+      display: block; width: 100%; max-width: 24rem; padding: 0.4rem 0.6rem; border: 1px solid #ccc;
+      border-radius: 0.25rem; background: #fff; font: inherit; line-height: 1.3; box-sizing: border-box;
+    }
+    .field input:focus, fieldset input:focus { outline: none; border-color: #888; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06); }
+    .og-form { margin-top: 0.5rem; }
+    .og-form .field-wide input { max-width: 28rem; }
+    fieldset form { display: flex; flex-direction: column; gap: 0.15rem; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Articles</h1>
+  <table>
+    <thead>
+      <tr><th>Path</th><th>Title</th><th>Visible</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for a in articles %}
+      <tr>
+        <td class="mono"><a href="{{ a.path }}/">{{ a.path }}</a></td>
+        <td>{{ a.title }}</td>
+        <td>{% if a.is_visible %}yes{% else %}no{% endif %}</td>
+        <td>
+          <div class="row">
+            <a href="/cms/articles/open?path={{ a.path_q }}" target="_blank" rel="noopener noreferrer">Verstka editor</a>
+            <form method="post" action="/cms/articles/visibility" style="display:inline">
+              <input type="hidden" name="path" value="{{ a.path }}">
+              <input type="hidden" name="is_visible" value="{{ a.is_visible ? 0 : 1 }}">
+              <button type="submit">{% if a.is_visible %}Hide{% else %}Show{% endif %}</button>
+            </form>
+            <form method="post" action="/cms/articles/delete" style="display:inline" onsubmit="return confirm('Delete this article?');">
+              <input type="hidden" name="path" value="{{ a.path }}">
+              <button type="submit">Delete</button>
+            </form>
+          </div>
+          <form method="post" action="/cms/articles/og" enctype="multipart/form-data" class="og-form">
+            <input type="hidden" name="path" value="{{ a.path }}">
+            <div class="field">
+              <label>OG title</label>
+              <input type="text" name="og_title" value="{{ a.og_title|default('') }}">
+            </div>
+            <div class="field field-wide">
+              <label>OG description</label>
+              <input type="text" name="og_description" value="{{ a.og_description|default('') }}">
+            </div>
+            <div class="field">
+              <label>OG image</label>
+              <input type="file" name="og_image" accept=".jpg,.jpeg,.png,.webp,.gif">
+            </div>
+            <button type="submit">Save OG</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <fieldset>
+    <legend>New article</legend>
+    <form method="post" action="/cms/articles/create">
+      <div class="field">
+        <label>Path (e.g. /blog/hello)</label>
+        <input name="path" required class="mono" placeholder="/index">
+      </div>
+      <div class="field">
+        <label>Title</label>
+        <input type="text" name="title">
+      </div>
+      <div class="field">
+        <label>OG title</label>
+        <input type="text" name="og_title">
+      </div>
+      <div class="field field-wide">
+        <label>OG description</label>
+        <input type="text" name="og_description">
+      </div>
+      <button type="submit">Create</button>
+    </form>
+  </fieldset>
+{% endblock %}

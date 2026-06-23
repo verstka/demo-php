@@ -1,0 +1,5 @@
+/vendor/
+/.env
+/data.db
+/storage/
+/.phpunit.cache/

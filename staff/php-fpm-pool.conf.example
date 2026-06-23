@@ -1,0 +1,24 @@
+; Copy to e.g. /etc/php/8.3/fpm/pool.d/demo-cms.conf
+; Then: sudo systemctl reload php8.3-fpm
+;
+; Match the socket path in staff/nginx.conf ($php_fpm).
+
+[demo-cms]
+user = www-data
+group = www-data
+listen = /run/php/php8.3-fpm-demo-cms.sock
+listen.owner = www-data
+listen.group = www-data
+
+pm = dynamic
+pm.max_children = 8
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 4
+
+; Match nginx client_max_body_size (OG uploads up to 5 MB in app)
+php_admin_value[upload_max_filesize] = 20M
+php_admin_value[post_max_size] = 20M
+
+; Optional: restrict to app tree
+; php_admin_value[open_basedir] = /var/www/demo-cms:/tmp

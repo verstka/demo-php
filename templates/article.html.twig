@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title|e }}</title>
+  <link rel="canonical" href="{{ canonical_url|e }}">
+{% if og_title %}
+  <meta property="og:title" content="{{ og_title|e }}">
+{% endif %}
+{% if og_description %}
+  <meta property="og:description" content="{{ og_description|e }}">
+{% endif %}
+{% if og_image %}
+  <meta property="og:image" content="{{ og_image|e }}">
+{% endif %}
+{% if fonts_css_exists %}
+  <link rel="stylesheet" href="/fonts/fonts.css">
+{% endif %}
+</head>
+<body>
+{% if menu_html %}
+  <div class="site-menu" data-site-menu>{{ menu_html|raw }}</div>
+{% endif %}
+{% if article_is_current_verstka_html %}
+  {{ article_html|raw }}
+{% else %}
+  <article class="verstka-legacy-article" data-verstka-legacy-article>{{ article_html|raw }}</article>
+{% endif %}
+{% if footer_html %}
+  <div class="site-footer" data-site-footer>{{ footer_html|raw }}</div>
+{% endif %}
+{% if viewer_bootstrap_enabled %}
+  <script type="module">
+    import({{ viewer_script_url_json|raw }}).then(({ Verstka }) => {
+      Verstka.initArticles(document);
+    }).catch((error) => {
+      console.error("Failed to initialize Verstka articles", error);
+    });
+  </script>
+{% endif %}
+</body>
+</html>
