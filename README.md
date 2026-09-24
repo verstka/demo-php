@@ -104,6 +104,7 @@ vendor/bin/phpunit
 
 - `src/` — application code (Slim routes, services, Verstka hooks).
 - `templates/` — Twig templates for CMS and static pages.
+- `static/` — CMS assets served at `/cms/static/` (CSS, JS, favicon, login image).
 - `public/` — web root (`index.php`).
 - `storage/` — generated files (listed in `.gitignore`).
 - `staff/` — nginx and php-fpm pool examples.

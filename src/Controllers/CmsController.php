@@ -380,6 +380,9 @@ final class CmsController
     /** @param array<string, mixed> $context */
     private function html(Response $response, string $template, array $context, int $status = 200): ResponseInterface
     {
+        if (!array_key_exists('current_email', $context)) {
+            $context['current_email'] = (string) ($_SESSION['user_email'] ?? '');
+        }
         $response->getBody()->write($this->render->render($template, $context));
 
         return $response->withHeader('Content-Type', 'text/html; charset=utf-8')->withStatus($status);

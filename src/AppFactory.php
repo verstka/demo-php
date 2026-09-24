@@ -65,6 +65,7 @@ final class AppFactory
         $cms = new CmsController($settings, $repo, $publish, $render, $editorClient);
         $callback = new VerstkaCallbackAction($verstkaClient, $storage, $hooks);
 
+        $app->get('/cms/static/{file}', self::cmsStaticHandler($settings));
         $app->get('/cms/login', [$cms, 'loginForm']);
         $app->post('/cms/login', [$cms, 'loginPost']);
         $app->get('/cms/logout', [$cms, 'logout']);
@@ -113,5 +114,39 @@ final class AppFactory
         );
 
         return $app;
+    }
+
+    /** @return callable(\Psr\Http\Message\ServerRequestInterface, Response, array): Response */
+    private static function cmsStaticHandler(Settings $settings): callable
+    {
+        $types = [
+            'css' => 'text/css; charset=utf-8',
+            'js' => 'application/javascript; charset=utf-8',
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'ico' => 'image/x-icon',
+        ];
+
+        return static function (
+            \Psr\Http\Message\ServerRequestInterface $request,
+            Response $response,
+            array $args,
+        ) use ($settings, $types): Response {
+            $file = basename((string) ($args['file'] ?? ''));
+            if ($file === '' || $file === '.' || $file === '..') {
+                return $response->withStatus(404);
+            }
+            $path = $settings->staticDir . '/' . $file;
+            if (!is_file($path)) {
+                $response->getBody()->write('Not found');
+
+                return $response->withStatus(404);
+            }
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            $contentType = $types[$ext] ?? 'application/octet-stream';
+            $response->getBody()->write((string) file_get_contents($path));
+
+            return $response->withHeader('Content-Type', $contentType);
+        };
     }
 }

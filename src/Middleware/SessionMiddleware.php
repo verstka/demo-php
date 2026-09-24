@@ -27,9 +27,7 @@ final class SessionMiddleware implements MiddlewareInterface
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);
-            if (!empty($this->settings->sessionSecret)) {
-                ini_set('session.sid_length', '48');
-            }
+            // ponytail: PHP 8.5+ deprecates session.sid_length; default SID length is fine for this demo
             session_start();
         }
 

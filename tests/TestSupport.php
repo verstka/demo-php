@@ -72,7 +72,11 @@ final class TestSupport
         ?PDO $pdo = null,
     ): App {
         LoginGuard::resetLoginFailures();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = [];
             session_destroy();
         }
         $_SESSION = [];
