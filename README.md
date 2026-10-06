@@ -56,7 +56,7 @@ The SDK checks `HMAC_SHA256(VERSTKA_API_SECRET, "{material_id}:{content_url}")` 
 2. **`VERSTKA_API_KEY`**, **`VERSTKA_API_SECRET`**, and **`VERSTKA_CALLBACK_URL`** are trimmed of leading/trailing whitespace when loaded from `.env`.
 3. With **`DEBUG=1`**, `VerstkaConfig(debug=true)` adds more detail if signature verification fails.
 
-Create an article with path **`/index`** for the home page (nginx redirects `/` → `/index/`).
+Create an article with path **`/index`** for the home page (nginx serves it at `/`).
 
 ## Viewer assets and article rendering
 
@@ -68,7 +68,7 @@ Example config: [`staff/nginx.conf`](staff/nginx.conf). PHP runs via **php-fpm**
 
 - **`root`** points at **`storage/`**, where the app writes `index.html`, article media, and `sitemap.xml` / `favicon.ico`.
 - **`/cms`** and **`/verstka/`** are passed to php-fpm → `public/index.php` (Slim).
-- **`/`** → **`/index/`**; articles are served with **`try_files`** and **`index.html`**.
+- **`/`** serves `storage/index/index.html`; `/index` and `/index/` redirect to `/`; other articles use **`try_files`** and **`index.html`**.
 
 ## Production deploy (nginx + php-fpm)
 
