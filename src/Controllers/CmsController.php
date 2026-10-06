@@ -199,6 +199,7 @@ final class CmsController
         }
         $row = $this->repo->updateArticleMeta(
             $p,
+            title: trim((string) ($data['title'] ?? '')) ?: $p,
             ogTitle: trim((string) ($data['og_title'] ?? '')) ?: null,
             ogDescription: trim((string) ($data['og_description'] ?? '')) ?: null,
             ogImageRelpath: $relImg,

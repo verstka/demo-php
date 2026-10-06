@@ -84,10 +84,33 @@ final class CmsLayoutTest extends TestCase
         self::assertStringContainsString('action="/cms/articles/create"', $body);
         self::assertStringContainsString('action="/cms/articles/visibility"', $body);
         self::assertStringContainsString('action="/cms/articles/og"', $body);
+        self::assertStringContainsString('name="title" value="Hello"', $body);
         self::assertStringContainsString('action="/cms/articles/delete"', $body);
         self::assertStringContainsString('/cms/articles/open?path=', $body);
         self::assertStringNotContainsString('>Statistics<', $body);
         self::assertStringContainsString('data-testid="logout-button"', $body);
+    }
+
+    public function testArticlesOgFormUpdatesTitle(): void
+    {
+        $app = $this->loggedInApp();
+        $response = TestSupport::request($app, 'POST', '/cms/articles/og', [
+            'path' => '/hi',
+            'title' => 'Renamed Hello',
+            'og_title' => 'Social Hello',
+            'og_description' => '',
+        ], sessionEmail: 'admin@example.test');
+
+        self::assertSame(303, $response->getStatusCode());
+        self::assertSame('/cms/articles', $response->getHeaderLine('Location'));
+
+        $listing = TestSupport::request($app, 'GET', '/cms/articles', sessionEmail: 'admin@example.test');
+        $body = TestSupport::responseBody($listing);
+
+        self::assertSame(200, $listing->getStatusCode());
+        self::assertStringContainsString('Renamed Hello', $body);
+        self::assertStringContainsString('name="title" value="Renamed Hello"', $body);
+        self::assertStringNotContainsString('>Hello<', $body);
     }
 
     public function testUsersPageUsesDashboardAndPreservesUserActions(): void
